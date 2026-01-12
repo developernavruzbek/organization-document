@@ -58,7 +58,7 @@ interface UserRepository:BaseRepository<User> {
 
 @Repository
 interface OrganizationRepository: BaseRepository<Organizatsion>{
-    fun findByName(name: String): Organizatsion?
+    fun findByNameAndDeletedFalse(name: String): Organizatsion?
 }
 @Repository
 interface DocumentTemplateRepository: BaseRepository<DocumentTemplate>{

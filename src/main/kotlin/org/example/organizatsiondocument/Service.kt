@@ -90,30 +90,37 @@ class UserServiceImpl(
             if (exist != null && exist.id != id) {
                 throw PhoneNumberAlreadyExistsException()
             }
-            user.phone = newPhone
+            if(newPhone.length>0)
+                 user.phone = newPhone
         }
 
-        body.fullName?.let { user.fullName = it }
+        body.fullName?.let {
+            if (it.length>0)
+            user.fullName = it }
 
         body.password?.let {
+            if (it.length>0)
             user.password = passwordEncoder.encode(it)
         }
 
-        body.role?.let { user.role = it }
+        body.role?.let {
+            user.role = it }
 
         body.organizatsionId?.let { orgId ->
-            val org = organizationRepository.findByIdAndDeletedFalse(orgId)
-                ?: throw OrganizationNotFoundException()
-            user.organizatsion = org
+            if (orgId!=0L){
+                val org = organizationRepository.findByIdAndDeletedFalse(orgId)
+                    ?: throw OrganizationNotFoundException()
+                user.organizatsion = org
+            }
         }
 
-        val updated = userRepository.saveAndRefresh(user)
+        val updated = userRepository.save(user)
         return mapper.toDto(updated)
     }
 
 
     override fun delete(id: Long) {
-        val deletedUser = userRepository.trash(id)
+           userRepository.trash(id)
             ?: throw UserNotFoundException()
     }
 
@@ -136,7 +143,7 @@ class OrganizationServiceImpl(
 
 ): OrganizationService {
     override fun create(organizationRequest: OrganizationRequest) {
-       organizationRepository.findByName(organizationRequest.name)?.let {
+       organizationRepository.findByNameAndDeletedFalse(organizationRequest.name)?.let {
            throw OrganizationNameAlreadyExists()
        }
         organizationRepository.save(mapper.toEntity(organizationRequest))
@@ -161,16 +168,18 @@ class OrganizationServiceImpl(
             ?: throw OrganizationNotFoundException()
 
         request.name?.let { newName ->
-            val exists = organizationRepository.findByName(newName)
+            val exists = organizationRepository.findByNameAndDeletedFalse(newName)
             if (exists != null && exists.id != id) {
                 throw OrganizationNameAlreadyExists()
             }
-            organization.name = newName
+            if (newName.length>0)
+                  organization.name = newName
         }
 
-        request.address?.let { organization.address = it }
+        if(request.address!=null && request.address.length>0)
+            organization.address = request.address
 
-        val updated = organizationRepository.saveAndRefresh(organization)
+        val updated = organizationRepository.save(organization)
         return mapper.toDto(updated)
     }
 

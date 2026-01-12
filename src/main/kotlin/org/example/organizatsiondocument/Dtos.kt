@@ -82,9 +82,6 @@ data class GeneratedDocumentResponse(
 
 object DocxFieldExtractor {
 
-    /**
-     * Fayldan {{field}} larni extract qiladi
-     */
     fun extractFields(filePath: String): List<String> {
         val fis = FileInputStream(filePath)
         val doc = XWPFDocument(fis)

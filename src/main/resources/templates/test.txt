@@ -1,0 +1,18 @@
+{
+  "contractNumber": "123/2026",
+  "contractPlace": "Toshkent",
+  "contractDate": "2026-01-12",
+  "customerName": "ABC MCHJ",
+  "customerAddress": "Toshkent, Olmazor ko'chasi 5",
+  "customerPhone": "+998901234567",
+  "executorName": "John Doe",
+  "executorAddress": "Toshkent, Yashnobod tumani",
+  "executorPhone": "+998909876543",
+  "serviceDescription": "Web sayt ishlab chiqish",
+  "service1": "Frontend ishlab chiqish",
+  "qty1": "1",
+  "price1": "3000 USD",
+  "service2": "Backend ishlab chiqish",
+  "qty2": "1",
+  "price2": "5000 USD"
+}
