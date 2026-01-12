@@ -96,7 +96,7 @@ class OrganizationController(
 
 @RestController
 @RequestMapping("/templates")
-@PreAuthorize("hasAuthority('ADMIN')")
+@PreAuthorize("hasAuthority('EMPLOYEE')")
 class DocumentTemplateController(
     private val templateService: DocumentTemplateService
 ) {
@@ -131,7 +131,7 @@ class DocumentTemplateController(
 
 @RestController
 @RequestMapping("/documents")
-@PreAuthorize("hasAnyAuthority('EMPLOYEE', 'ADMIN')")
+@PreAuthorize("hasAuthority('EMPLOYEE')")
 class DocumentGenerationController(
     private val documentGenerationService: DocumentGenerationService
 ) {
@@ -151,7 +151,7 @@ class DocumentGenerationController(
 
 @RestController
 @RequestMapping("/documents")
-@PreAuthorize("hasAnyAuthority('EMPLOYEE', 'ADMIN')")
+@PreAuthorize("hasAuthority('EMPLOYEE')")
 class DocumentDownloadController(
     private val downloadService: DocumentDownloadService
 ) {
