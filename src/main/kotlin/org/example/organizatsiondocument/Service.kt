@@ -21,6 +21,11 @@ import java.util.UUID
 interface UserService{
     fun create(body:UserCreateRequest)
     fun loginIn(request: LoginRequest) : JwtResponse
+
+    fun getAll(): List<UserResponse>
+    fun getById(id: Long): UserResponse
+    fun update(id: Long, body: UserUpdateRequest): UserResponse
+    fun delete(id: Long)
 }
 
 @Service
@@ -60,12 +65,68 @@ class UserServiceImpl(
         val token  = jwtService.generateToken(user.phone, user.role.name)
         return JwtResponse(token)
     }
+
+    override fun getAll(): List<UserResponse> {
+        return userRepository.findAllNotDeleted()
+            .map { mapper.toDto(it) }
+    }
+
+    override fun getById(id: Long): UserResponse {
+        val user = userRepository.findByIdAndDeletedFalse(id)
+            ?: throw UserNotFoundException()
+
+        return mapper.toDto(user)
+    }
+
+
+    @Transactional
+    override fun update(id: Long, body: UserUpdateRequest): UserResponse {
+
+        val user = userRepository.findByIdAndDeletedFalse(id)
+            ?: throw UserNotFoundException()
+
+        body.phone?.let { newPhone ->
+            val exist = userRepository.findByPhone(newPhone)
+            if (exist != null && exist.id != id) {
+                throw PhoneNumberAlreadyExistsException()
+            }
+            user.phone = newPhone
+        }
+
+        body.fullName?.let { user.fullName = it }
+
+        body.password?.let {
+            user.password = passwordEncoder.encode(it)
+        }
+
+        body.role?.let { user.role = it }
+
+        body.organizatsionId?.let { orgId ->
+            val org = organizationRepository.findByIdAndDeletedFalse(orgId)
+                ?: throw OrganizationNotFoundException()
+            user.organizatsion = org
+        }
+
+        val updated = userRepository.saveAndRefresh(user)
+        return mapper.toDto(updated)
+    }
+
+
+    override fun delete(id: Long) {
+        val deletedUser = userRepository.trash(id)
+            ?: throw UserNotFoundException()
+    }
+
 }
 
 
 interface OrganizationService{
     fun create(organizationRequest:OrganizationRequest)
     fun getOne(id:Long): OrganizationResponse
+
+    fun getAll(): List<OrganizationResponse>
+    fun update(id: Long, request: OrganizationUpdateRequest): OrganizationResponse
+    fun delete(id: Long)
 }
 
 @Service
@@ -87,6 +148,35 @@ class OrganizationServiceImpl(
 
       } ?:throw OrganizationNotFoundException()
 
+    }
+
+    override fun getAll(): List<OrganizationResponse> {
+        return organizationRepository.findAllNotDeleted()
+            .map { mapper.toDto(it) }
+    }
+
+    @Transactional
+    override fun update(id: Long, request: OrganizationUpdateRequest): OrganizationResponse {
+        val organization = organizationRepository.findByIdAndDeletedFalse(id)
+            ?: throw OrganizationNotFoundException()
+
+        request.name?.let { newName ->
+            val exists = organizationRepository.findByName(newName)
+            if (exists != null && exists.id != id) {
+                throw OrganizationNameAlreadyExists()
+            }
+            organization.name = newName
+        }
+
+        request.address?.let { organization.address = it }
+
+        val updated = organizationRepository.saveAndRefresh(organization)
+        return mapper.toDto(updated)
+    }
+
+    override fun delete(id: Long) {
+        organizationRepository.trash(id)
+            ?: throw OrganizationNotFoundException()
     }
 }
 
@@ -113,7 +203,6 @@ class DocumentTemplateServiceImpl(
 ) : DocumentTemplateService {
 
     private val templateBasePath = "/home/navzruzbek/IdeaProjects/work/organizatsion-document/files/templates"
-    // fayllar saqlanadigan folder
 
     @Transactional
     override fun uploadTemplate(

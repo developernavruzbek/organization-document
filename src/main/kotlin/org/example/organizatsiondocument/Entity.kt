@@ -34,7 +34,7 @@ class BaseEntity(
 
 @Entity
 class Organizatsion(
-    @Column(nullable = false, unique = true) val name :String,
+    @Column(nullable = false, unique = true) var name :String,
     var address:String? =null
 ): BaseEntity()
 

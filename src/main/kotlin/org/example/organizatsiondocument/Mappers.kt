@@ -19,6 +19,17 @@ class UserMapper(
         }
     }
 
+    fun toDto(user: User): UserResponse {
+        return UserResponse(
+            id = user.id!!,
+            fullName = user.fullName,
+            phone = user.phone,
+            role = user.role,
+            organizationId = user.organizatsion.id!!,
+            organizationName = user.organizatsion.name
+        )
+    }
+
     /*
     fun toDto(user: User): UserResponse{
         user.run {

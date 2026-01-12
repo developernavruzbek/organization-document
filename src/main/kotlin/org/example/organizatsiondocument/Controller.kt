@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -22,13 +23,44 @@ class AuthController(
 }
 
 
+@RestController
+@RequestMapping("/users")
+@PreAuthorize("hasAuthority('ADMIN')")
+class UserController(
+    private val userService: UserService
 
-class UserController(){
+){
+
+    @GetMapping
+    fun getAll(): List<UserResponse> {
+        return userService.getAll()
+    }
+
+
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Long): UserResponse {
+        return userService.getById(id)
+    }
+
+    @PutMapping("/{id}")
+    fun update(
+        @PathVariable id: Long,
+        @RequestBody body: UserUpdateRequest
+    ): UserResponse {
+        return userService.update(id, body)
+    }
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: Long): BaseMessage {
+        userService.delete(id)
+        return BaseMessage(200, "User deleted successfully")
+    }
 
 }
 
 @RestController
 @RequestMapping("/organization")
+@PreAuthorize("hasAuthority('ADMIN')")
 class OrganizationController(
     private val organizationService: OrganizationService
 ){
@@ -37,10 +69,34 @@ class OrganizationController(
 
     @GetMapping("/{id}")
     fun getOne(@PathVariable id: Long) = organizationService.getOne(id)
+
+
+    @GetMapping
+    fun getAll(): List<OrganizationResponse> =
+        organizationService.getAll()
+
+
+    @PutMapping("/{id}")
+    fun update(
+        @PathVariable id: Long,
+        @RequestBody request: OrganizationUpdateRequest
+    ): OrganizationResponse {
+        return organizationService.update(id, request)
+    }
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: Long): BaseMessage {
+        organizationService.delete(id)
+        return BaseMessage(200, "Organization deleted successfully")
+    }
+
 }
+
+
 
 @RestController
 @RequestMapping("/templates")
+@PreAuthorize("hasAuthority('ADMIN')")
 class DocumentTemplateController(
     private val templateService: DocumentTemplateService
 ) {
@@ -75,6 +131,7 @@ class DocumentTemplateController(
 
 @RestController
 @RequestMapping("/documents")
+@PreAuthorize("hasAnyAuthority('EMPLOYEE', 'ADMIN')")
 class DocumentGenerationController(
     private val documentGenerationService: DocumentGenerationService
 ) {
@@ -94,6 +151,7 @@ class DocumentGenerationController(
 
 @RestController
 @RequestMapping("/documents")
+@PreAuthorize("hasAnyAuthority('EMPLOYEE', 'ADMIN')")
 class DocumentDownloadController(
     private val downloadService: DocumentDownloadService
 ) {

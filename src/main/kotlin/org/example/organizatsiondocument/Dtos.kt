@@ -19,6 +19,24 @@ data class UserCreateRequest(
     val role: UserRole,
 )
 
+data class UserUpdateRequest(
+    val fullName: String?,
+    val phone: String?,
+    val password: String?,
+    val role: UserRole?,
+    val organizatsionId: Long?
+)
+
+data class UserResponse(
+    val id: Long,
+    val fullName: String,
+    val phone: String,
+    val role: UserRole,
+    val organizationId: Long,
+    val organizationName: String?
+)
+
+
 data class OrganizationRequest(
     val name:String,
     val address:String
@@ -29,6 +47,12 @@ data class OrganizationResponse(
     val name:String,
     val address:String?
 )
+
+data class OrganizationUpdateRequest(
+    val name: String?,
+    val address: String?
+)
+
 
 data class TemplateUploadRequest(
     val organizationId: Long
