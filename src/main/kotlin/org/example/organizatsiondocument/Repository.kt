@@ -60,3 +60,17 @@ interface UserRepository:BaseRepository<User> {
 interface OrganizationRepository: BaseRepository<Organizatsion>{
     fun findByName(name: String): Organizatsion?
 }
+@Repository
+interface DocumentTemplateRepository: BaseRepository<DocumentTemplate>{
+
+}
+@Repository
+interface TemplateFieldRepository: BaseRepository<TemplateField>{
+    fun findAllByTemplate(template: DocumentTemplate): List<TemplateField>
+
+}
+
+@Repository
+interface GeneratedDocumentRepository : BaseRepository<GeneratedDocument> {
+    fun findAllByUser(user: User): List<GeneratedDocument>
+}

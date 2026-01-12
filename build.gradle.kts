@@ -21,9 +21,13 @@ repositories {
 }
 
 dependencies {
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
+    // implementation("org.apache.xmlbeans:xmlbeans:5.1.1") <-- bu olib tashlanadi
+
+    // Spring va boshqa dependencies
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
@@ -36,6 +40,15 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.apache.xmlbeans") {
+            useVersion("5.1.1")
+        }
+    }
+}
+
 kotlin {
     jvmToolchain(17)
     compilerOptions {

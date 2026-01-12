@@ -74,3 +74,28 @@ class OrganizationMapper(
         }
     }
 }
+
+@Component
+class DocumentTemplateMapper {
+
+
+    fun toResponse(template: DocumentTemplate, fields: List<TemplateFieldResponse>) =
+        TemplateUploadResponse(
+            templateId = template.id!!,
+            templateName = template.templateName,
+            organizationId = template.organization.id!!,
+            fields = fields
+        )
+}
+
+@Component
+class TemplateFieldMapper {
+
+    fun toResponse(field: TemplateField) = TemplateFieldResponse(
+        id = field.id,
+        key = field.fieldKey,
+        label = field.label
+    )
+
+    fun toResponseList(fields: List<TemplateField>) = fields.map { toResponse(it) }
+}

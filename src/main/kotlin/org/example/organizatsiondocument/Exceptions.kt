@@ -64,3 +64,8 @@ class OrganizationNameAlreadyExists(): DemoExceptionHandler(){
 class PasswordIsIncorrect: DemoExceptionHandler(){
     override fun errorCode() = ErrorCodes.PASSWORD_IS_INCORRECT
 }
+
+class TemplateNotFoundException(): DemoExceptionHandler(){
+    override fun errorCode() = ErrorCodes.TEMPLATE_NOT_FOUND
+
+}

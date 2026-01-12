@@ -29,6 +29,7 @@ enum class ErrorCodes(val code: Long) {
     SUPPLIER_NOT_FOUND(210),
 
     PENDING_ORDER_NOT_FOUND(300),
-    FORBIDDEN(301)
+    FORBIDDEN(301),
+    TEMPLATE_NOT_FOUND(500)
 }
 

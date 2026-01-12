@@ -1,8 +1,10 @@
 package org.example.organizatsiondocument
 
+import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import java.io.FileInputStream
 
 data class BaseMessage(
     val code: Long? = null,
@@ -27,6 +29,69 @@ data class OrganizationResponse(
     val name:String,
     val address:String?
 )
+
+data class TemplateUploadRequest(
+    val organizationId: Long
+)
+
+data class TemplateUploadResponse(
+    val templateId: Long,
+    val templateName: String,
+    val organizationId: Long,
+    val fields: List<TemplateFieldResponse>
+)
+
+data class TemplateFieldResponse(
+    val id: Long?,
+    val key: String,
+    val label: String?
+)
+
+data class GeneratedDocumentResponse(
+    val id: Long,
+    val templateName: String,
+    val userFullName: String,
+    val filePath: String,
+    val createdDate: String
+)
+
+
+object DocxFieldExtractor {
+
+    /**
+     * Fayldan {{field}} larni extract qiladi
+     */
+    fun extractFields(filePath: String): List<String> {
+        val fis = FileInputStream(filePath)
+        val doc = XWPFDocument(fis)
+        val fields = mutableSetOf<String>()
+
+        // Paragraphlarni tekshirish
+        for (paragraph in doc.paragraphs) {
+            val regex = "\\{\\{(.*?)}}".toRegex()
+            regex.findAll(paragraph.text).forEach { match ->
+                fields.add(match.groupValues[1])
+            }
+        }
+
+        // Table ichidagi matnlarni ham tekshirish
+        for (table in doc.tables) {
+            for (row in table.rows) {
+                for (cell in row.tableCells) {
+                    val regex = "\\{\\{(.*?)}}".toRegex()
+                    regex.findAll(cell.text).forEach { match ->
+                        fields.add(match.groupValues[1])
+                    }
+                }
+            }
+        }
+
+        fis.close()
+        return fields.toList()
+    }
+}
+
+
 
 
 data class UserDetailsResponse(
